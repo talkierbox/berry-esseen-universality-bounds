@@ -1,0 +1,14 @@
+# Ignore Python virtual environments, notebook checkpoints, and cache files
+.pynb_checkpoints/*
+.venv/
+__pycache__/
+*.pyc
+/.ipynb_checkpoints
+.DS_Store
+
+# Ignore the figures directory
+figures/*
+
+# Ignore data files
+data/*
+data2/*
