@@ -1,4 +1,4 @@
-## Berry–Esseen Universality in Sparse Random‑Regular Graphs
+# Berry–Esseen Universality in Sparse Random‑Regular Graphs
 
 This repo is an **empirical check** of the Berry–Esseen bounds proved by  
 *Leonhard Nagel (2025) and Huang & Yau (2023)* for eigenvector overlaps in sparse random‑regular graphs.
