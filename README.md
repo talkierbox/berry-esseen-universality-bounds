@@ -8,8 +8,8 @@ This repo is an **empirical check** of the Berry–Esseen bounds proved by
 
 | # | Goal | Status |
 |---|------|--------|
-| **1** | **Fixed‑degree test**: simulate multiple $(d,N)$ pairs, compute KS distance $D_N$, confirm the $\log D_N$ vs $\log N$ slope ≈ $-\frac{1}{6}$. | **Done ✅** |
-| **2** | Growing‑degree test: let $d(N)\lesssim N^{1/4}$, verify $D_N\sim\sqrt d\,N^{-1/6}$ after rescaling. | Planned 🕒 |
+| **1** | **Fixed-degree test**: simulate multiple (d, N) pairs, compute KS distance D_N, confirm the log D_N vs log N slope ≈ -1/6. | **Done ✅** |
+| **2** | Growing-degree test: let d(N) ≲ N^0.25, verify D_N ~ sqrt(d) · N^(-1/6) after rescaling. | Planned 🕒 |
 
 ---
 
