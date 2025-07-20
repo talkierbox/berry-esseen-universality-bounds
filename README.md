@@ -18,5 +18,7 @@ This repo is an **empirical check** of the Berry–Esseen bounds proved by
 ```bash
 # clone & set up
 git clone https://github.com/talkierbox/berry-essen-universality-bounds
+pip install -r requirements.txt
+python generate_graphs.py
 jupyterlab main.ipynb
 ```
