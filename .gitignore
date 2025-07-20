@@ -10,6 +10,6 @@ __pycache__/
 figures/*
 
 # Ignore data files
-data/*
-data2/*
-data_old/*
+data/*/*
+*.pkl
+*.npz
