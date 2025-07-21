@@ -16,7 +16,7 @@ We:
 | Step | Task | What we expect | Status |
 |------|------|----------------|--------|
 | **1** | **Fixed degree** | For several (d, N) pairs, slope of log D_N vs log N ≈ ‑1/6 | **Done ✅** |
-| **2** | **Growing degree** | For d(N) ≤ N^0.25, slope stays ≈ ‑1/6 after dividing D_N by √d | In progress 🕒 |
+| **2** | **Growing degree** | For d(N) ≤ N^0.25, slope stays ≈ ‑1/6 after dividing D_N by √d |  **Done ✅** |
 
 ---
 
