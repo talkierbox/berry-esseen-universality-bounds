@@ -89,7 +89,7 @@ if __name__ == "__main__":
             samples=NUM_TO_GENERATE,
             out_dir=out_dir,
             base_seed=RANDOM_SEED,
-            chunk_size=1024,
+            chunk_size=512,
             n_jobs=None,
         )
         print(f"Finished d={d}. Graphs saved in {out_dir}")
