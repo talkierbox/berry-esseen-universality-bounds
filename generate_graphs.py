@@ -19,7 +19,7 @@ DATA = BASE / "data"
 DATA.mkdir(exist_ok=True)
 
 RANDOM_SEED = 42
-NUM_TO_GENERATE = 2_000
+NUM_TO_GENERATE = 5_000
 
 D_SELECTION = [3, 5, 10, 20] # 20 > N^0.25 for N = 100_000 --- breaks the bound
 N_SELECTION = [5_000, 10_000, 50_000, 100_000]
