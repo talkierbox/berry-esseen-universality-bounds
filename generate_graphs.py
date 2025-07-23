@@ -19,10 +19,10 @@ DATA = BASE / "data"
 DATA.mkdir(exist_ok=True)
 
 RANDOM_SEED = 42
-NUM_TO_GENERATE = 5_000
+NUM_TO_GENERATE = 3_500
 
 D_SELECTION = [3, 5, 10, 20] # 20 > N^0.25 for N = 100_000 --- breaks the bound
-N_SELECTION = [5_000, 10_000, 50_000, 100_000]
+N_SELECTION = [1_000, 10_000, 100_000, 1_000_000]
 
 def _build_and_store(n: int, d: int, seed: int, out_dir: Path) -> str:
     """Build one d-regular graph and save its edge list."""
@@ -61,6 +61,9 @@ def generate_regular_graphs(
         seeds = rng.integers(0, 2**32 - 1, size=samples, dtype=np.uint32)
         saved: List[str] = []
 
+        if n > 100_000:
+            chunk_size = min(chunk_size, 64)  # Reduce memory usage for large n
+
         with tqdm(total=samples, desc=f"d={d}, n={n}", unit="graph") as bar:
             for start in range(0, samples, chunk_size):
                 stop = min(start + chunk_size, samples)
@@ -79,6 +82,8 @@ def generate_regular_graphs(
 if __name__ == "__main__":
     print("Generating graphs... This may take a while.")
 
+    CHUNK_SIZE = 512
+
     for d in tqdm(D_SELECTION, desc="Overall progress"):
         out_dir = DATA / f"d{d}"
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -89,7 +94,7 @@ if __name__ == "__main__":
             samples=NUM_TO_GENERATE,
             out_dir=out_dir,
             base_seed=RANDOM_SEED,
-            chunk_size=512,
+            chunk_size=CHUNK_SIZE,
             n_jobs=None,
         )
         print(f"Finished d={d}. Graphs saved in {out_dir}")
