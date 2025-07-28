@@ -13,3 +13,19 @@ figures/*
 data/*/*
 *.pkl
 *.npz
+
+# Rust build artifacts
+/target/
+Cargo.lock
+*.pdb
+*.so
+*.dylib
+*.dll
+
+# Python wheel build artifacts
+build/
+dist/
+*.egg-info/
+
+# Maturin build artifacts
+.cargo/

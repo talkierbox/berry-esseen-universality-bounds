@@ -1,0 +1,15 @@
+[package]
+name = "fast_graph_gen"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "fast_graph_gen"
+crate-type = ["cdylib"]
+
+[dependencies]
+rand = "0.8"
+rayon = "1.7"
+sprs = "0.11"
+numpy = "0.25"
+pyo3 = { version = "0.25", features = ["extension-module"] }

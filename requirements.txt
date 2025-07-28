@@ -16,11 +16,14 @@ joblib==1.5.1
 jupyter_client==8.6.3
 jupyter_core==5.8.1
 kiwisolver==1.4.8
+llvmlite==0.44.0
 matplotlib==3.10.3
 matplotlib-inline==0.1.7
+maturin==1.9.2
 nest-asyncio==1.6.0
 networkx==3.5
-numpy==2.3.1
+numba==0.61.2
+numpy==2.2.6
 packaging==25.0
 pandas==2.3.1
 parso==0.8.4
