@@ -1,6 +1,5 @@
 """
 Fast d-regular graph generator with optional Rust backend.
-Keeps memory usage low by staying in sparse CSR format.
 """
 
 from pathlib import Path
@@ -26,8 +25,8 @@ BASE          = Path.cwd()
 DATA          = BASE / "data"
 DATA.mkdir(exist_ok=True)
 D_SELECTION   = [3, 5, 8, 10]
-N_SELECTION   = [1_000, 10_000, 100_000]
-NUM_TO_GEN    = 3_500
+N_SELECTION   = [1_000, 10_000, 50_000]
+NUM_TO_GEN    = 5_000
 RANDOM_SEED   = 42
 
 # Helpers
@@ -141,7 +140,7 @@ def generate_graphs(
         written = []
         if RUST:
             batch = 64 if n > 50_000 else 256 if n > 10_000 else 512
-            for s0 in tqdm(range(0, samples, batch), desc=f"d={d} n={n}", unit="graph"):
+            for s0 in tqdm(range(0, samples, batch), desc=f"d={d} n={n}", unit="graph", ncols=90):
                 chunk = seeds[s0:s0 + batch].tolist()
                 for A, seed in zip(_rust_batch_csr(n, d, chunk), chunk):
                     fname = out_dir / f"g_d{d}_n{n}_{seed}.npz"
@@ -158,6 +157,6 @@ def generate_graphs(
 
 if __name__ == "__main__":
     for d in D_SELECTION:
-        out = DATA / f"d{d}_uniform"
+        out = DATA / f"d{d}"
         generate_graphs(d, N_SELECTION, NUM_TO_GEN, out, RANDOM_SEED)
         print(f"Finished d={d} -> {out}")
