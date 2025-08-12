@@ -24,9 +24,9 @@ except ImportError:
 BASE          = Path.cwd()
 DATA          = BASE / "data"
 DATA.mkdir(exist_ok=True)
-D_SELECTION   = [3, 5, 8, 10]
-N_SELECTION   = [1_000, 10_000, 50_000]
-NUM_TO_GEN    = 5_000
+D_SELECTION   = [3, 5]
+N_SELECTION   = [1_000, 10_000, 100_000, 500_000, 1_000_000]
+NUM_TO_GEN    = 300
 RANDOM_SEED   = 42
 
 # Helpers
