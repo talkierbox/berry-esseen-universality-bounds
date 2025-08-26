@@ -29,3 +29,4 @@ dist/
 
 # Maturin build artifacts
 .cargo/
+.vscode/settings.json
