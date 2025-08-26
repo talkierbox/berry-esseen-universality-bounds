@@ -1,15 +1,20 @@
 [package]
-name = "fast_graph_gen"
+name = "rand_d_regular"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "fast_graph_gen"
+name = "rand_d_regular"
 crate-type = ["cdylib"]
 
 [dependencies]
+pyo3 = { version = "0.21", features = ["extension-module"] }
+numpy = "0.21"
 rand = "0.8"
-rayon = "1.7"
-sprs = "0.11"
-numpy = "0.25"
-pyo3 = { version = "0.25", features = ["extension-module"] }
+hashbrown = "0.14"
+rayon = "1.10"
+
+[profile.release]
+opt-level = 3
+codegen-units = 1
+lto = "fat"
