@@ -15,23 +15,24 @@ import sys
 def test_rust_backend():
     """Test if Rust backend is available and working."""
     try:
-        import fast_graph_gen
+        from rand_d_regular import d_regular_near_uniform
         return True
     except ImportError:
         print("❌ Rust backend not available")
         return False
 
-def to_csr(n: int, rows, cols, data) -> sp.csr_matrix:
-    """Convert sparse arrays to CSR matrix."""
-    # Ensure proper dtypes
-    rows = np.asarray(rows, dtype=np.int32)
-    cols = np.asarray(cols, dtype=np.int32)
+def to_csr(n: int, edges: np.ndarray) -> sp.csr_matrix:
+    """Convert edge array to CSR matrix."""
+    # edges is (m,2) array with undirected edges
+    edges = np.asarray(edges, dtype=np.int32)
+    u = edges[:, 0]
+    v = edges[:, 1]
+    m = len(edges)
     
-    # Handle data that might come as bytes from Rust
-    if isinstance(data, (bytes, bytearray)):
-        data = np.frombuffer(data, dtype=np.uint8)
-    else:
-        data = np.asarray(data, dtype=np.uint8)
+    # Create symmetric matrix
+    rows = np.concatenate([u, v])
+    cols = np.concatenate([v, u])
+    data = np.ones(2 * m, dtype=np.uint8)
     
     return sp.csr_matrix((data, (rows, cols)), shape=(n, n), dtype=np.uint8)
 
@@ -51,14 +52,14 @@ def test_d_regularity(n: int, d: int, num_tests: int = 10):
     if not test_rust_backend():
         return False
     
-    import fast_graph_gen
+    from rand_d_regular import d_regular_near_uniform
     
     issues = []
     
     with tqdm(range(num_tests), desc="Checking d-regularity", leave=False) as pbar:
         for seed in pbar:
-            rows, cols, data = fast_graph_gen.generate_uniform_regular(n, d, seed, 3)
-            A = to_csr(n, rows, cols, data)
+            edges = d_regular_near_uniform(n, d, seed, 5.0)
+            A = to_csr(n, edges)
             
             # Check degree sequence
             degrees = np.array(A.sum(axis=1)).flatten()
@@ -94,14 +95,14 @@ def test_simple_graph(n: int, d: int, num_tests: int = 10):
     if not test_rust_backend():
         return False
     
-    import fast_graph_gen
+    from rand_d_regular import d_regular_near_uniform
     
     issues = []
     
     with tqdm(range(num_tests), desc="Checking simplicity", leave=False) as pbar:
         for seed in pbar:
-            rows, cols, data = fast_graph_gen.generate_uniform_regular(n, d, seed, 3)
-            A = to_csr(n, rows, cols, data)
+            edges = d_regular_near_uniform(n, d, seed, 5.0)
+            A = to_csr(n, edges)
             
             # Check for self-loops
             if A.diagonal().sum() > 0:
@@ -129,15 +130,15 @@ def test_uniformity(n: int, d: int, num_tests: int = 100):
     if not test_rust_backend():
         return False
     
-    import fast_graph_gen
+    from rand_d_regular import d_regular_near_uniform
     
     # Generate multiple graphs and collect them
     graphs = []
     
     with tqdm(range(num_tests), desc="Generating graphs", leave=False) as pbar:
         for seed in pbar:
-            rows, cols, data = fast_graph_gen.generate_uniform_regular(n, d, seed, 3)
-            A = to_csr(n, rows, cols, data)
+            edges = d_regular_near_uniform(n, d, seed, 5.0)
+            A = to_csr(n, edges)
             edge_set = get_edge_set(A)
             graphs.append(frozenset(edge_set))
     
@@ -165,18 +166,18 @@ def test_edge_distribution(n: int, d: int, num_tests: int = 1000):
     if not test_rust_backend():
         return False
     
-    import fast_graph_gen
+    from rand_d_regular import d_regular_near_uniform
     
     # Count how often each edge appears
     edge_counts = defaultdict(int)
     
     with tqdm(range(num_tests), desc="Analyzing edge distribution", leave=False) as pbar:
         for seed in pbar:
-            rows, cols, data = fast_graph_gen.generate_uniform_regular(n, d, seed, 3)
-            A = to_csr(n, rows, cols, data)
-            edges = get_edge_set(A)
+            edges = d_regular_near_uniform(n, d, seed, 5.0)
+            A = to_csr(n, edges)
+            edges_set = get_edge_set(A)
             
-            for edge in edges:
+            for edge in edges_set:
                 edge_counts[edge] += 1
     
     # Analyze distribution
@@ -209,26 +210,31 @@ def benchmark_speed(n: int, d: int, num_graphs: int = 100):
     if not test_rust_backend():
         return
     
-    import fast_graph_gen
+    from rand_d_regular import d_regular_near_uniform, d_regular_near_uniform_batch
     import time
     
     # Single graph generation
     start = time.time()
     with tqdm(range(num_graphs), desc="Single generation", leave=False) as pbar:
         for i in pbar:
-            rows, cols, data = fast_graph_gen.generate_uniform_regular(n, d, i, 3)
+            edges = d_regular_near_uniform(n, d, i, 5.0)
     single_time = time.time() - start
     
-    # Batch generation  
-    start = time.time()
-    print("   Running batch generation...", end="", flush=True)
-    batch_result = fast_graph_gen.generate_multiple_graphs_sparse(n, d, num_graphs, 0, 3)
-    batch_time = time.time() - start
-    print(" Done!")
-    
-    print(f"   Single: {single_time:.3f}s ({single_time/num_graphs*1000:.2f}ms/graph)")
-    print(f"   Batch:  {batch_time:.3f}s ({batch_time/num_graphs*1000:.2f}ms/graph)")
-    print(f"   Speedup: {single_time/batch_time:.2f}x")
+    # Batch generation if available
+    try:
+        start = time.time()
+        print("   Running batch generation...", end="", flush=True)
+        seeds = list(range(num_graphs))
+        batch_result = d_regular_near_uniform_batch(n, d, seeds, 5.0)
+        batch_time = time.time() - start
+        print(" Done!")
+        
+        print(f"   Single: {single_time:.3f}s ({single_time/num_graphs*1000:.2f}ms/graph)")
+        print(f"   Batch:  {batch_time:.3f}s ({batch_time/num_graphs*1000:.2f}ms/graph)")
+        print(f"   Speedup: {single_time/batch_time:.2f}x")
+    except (ImportError, AttributeError):
+        print("   Batch generation not available")
+        print(f"   Single: {single_time:.3f}s ({single_time/num_graphs*1000:.2f}ms/graph)")
 
 def benchmark_rust_vs_python(n: int, d: int, num_graphs: int = 20):
     """Compare Rust backend speed vs Python/Numba implementation."""
@@ -254,7 +260,7 @@ def benchmark_rust_vs_python(n: int, d: int, num_graphs: int = 20):
         print("   ❌ Rust backend not available")
         return
     
-    import fast_graph_gen
+    from rand_d_regular import d_regular_near_uniform
     
     print(f"   Testing with {num_graphs} graphs...")
     
@@ -273,8 +279,8 @@ def benchmark_rust_vs_python(n: int, d: int, num_graphs: int = 20):
     start = time.time()
     rust_graphs = []
     for i in range(num_graphs):
-        rows, cols, data = fast_graph_gen.generate_uniform_regular(n, d, i, 3)
-        A = to_csr(n, rows, cols, data)
+        edges = d_regular_near_uniform(n, d, i, 5.0)
+        A = to_csr(n, edges)
         rust_graphs.append(A)
     rust_time = time.time() - start
     print(" Done!")
