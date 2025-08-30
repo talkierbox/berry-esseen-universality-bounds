@@ -11,6 +11,7 @@ figures/*
 
 # Ignore data files
 data/*/*
+data_old/*
 *.pkl
 *.npz
 
